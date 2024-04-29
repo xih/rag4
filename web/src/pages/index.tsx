@@ -1,3 +1,4 @@
+// [4-29-2024] worklog
 // 1. add 2 more input fields for name and deletepages
 // 2. add a collapse
 // 3. change up the values so that the form is set correctly
@@ -9,6 +10,7 @@
 // 5. after clicking submit, open up a bottom sheet
 // 6. click on submit which opens the drawer with the the correct input
 // 6. clicking on submit sends an API request that gets back the data
+// 7. clicking submit, triggers a loader for 1 sec, then opens up the sheet
 
 import { Button } from "@/components/ui/button";
 import {
