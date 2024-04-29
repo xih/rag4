@@ -13,18 +13,24 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { clsx } from "clsx";
+import { useStore } from "@/store";
 
 export default function BottomSheet() {
   const [open, setOpen] = React.useState(false);
   const [snap, setSnap] = useState<number | string | null>();
+
+  const { isDrawerOpen, setDrawerOpen } = useStore();
+
   return (
     <Drawer
       snapPoints={["148px", "355px", 1]}
       activeSnapPoint={snap}
       setActiveSnapPoint={setSnap}
+      open={isDrawerOpen}
+      onOpenChange={setDrawerOpen}
     >
       <DrawerTrigger asChild>
-        <Button>Open Drawer</Button>
+        <Button variant="ghost">Open Drawer</Button>
       </DrawerTrigger>
       <DrawerOverlay className="fixed inset-0 bg-black/40" />
       <DrawerPortal>

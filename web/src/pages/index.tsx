@@ -11,6 +11,7 @@
 // 6. click on submit which opens the drawer with the the correct input
 // 6. clicking on submit sends an API request that gets back the data
 // 7. clicking submit, triggers a loader for 1 sec, then opens up the sheet
+// 8. add zustand for state
 
 import { Button } from "@/components/ui/button";
 import {
@@ -35,6 +36,8 @@ import { ChevronsUpDown, Plus, X } from "lucide-react";
 import BottomSheet from "@/components/custom/BottomSheet";
 import { useState } from "react";
 import hardcodedData from "@/data/hardCodedData";
+import { useStore } from "@/store/index";
+import LoadingButton from "@/components/custom/LoadingButton";
 
 const formSchema = z.object({
   username: z.string().min(2).max(50),
@@ -54,6 +57,13 @@ type ArxivPaperNote = {
 export default function Home() {
   const [notes, setNotes] = useState<ArxivPaperNote[]>();
 
+  const {
+    isNotesLoading,
+    setNotesLoading,
+    isNotesLoadedSuccess,
+    setNotesLoadedSuccess,
+  } = useStore();
+
   const paperForm = useForm<z.infer<typeof arxivPaperFormSchema>>({
     resolver: zodResolver(arxivPaperFormSchema),
     defaultValues: {
@@ -63,6 +73,7 @@ export default function Home() {
   });
 
   async function onPaperSubmit(values: z.infer<typeof arxivPaperFormSchema>) {
+    setNotesLoading(true);
     const response = await fetch("/api/take_notes", {
       method: "post",
       body: JSON.stringify(values),
@@ -83,6 +94,8 @@ export default function Home() {
       console.log(notes, "notes");
       // throw new Error("something went wrong taking notes");
     }
+    setNotesLoading(false);
+    setNotesLoadedSuccess(true);
   }
 
   return (
@@ -149,7 +162,13 @@ export default function Home() {
               </CollapsibleContent>
             </Collapsible>
 
-            <Button type="submit">Submit</Button>
+            <div className="mt-10">
+              <Button type="submit">Submit</Button>
+            </div>
+            <LoadingButton
+              isLoading={isNotesLoading}
+              setIsLoading={setNotesLoading}
+            />
           </form>
         </Form>
         <div className="mt-8">
