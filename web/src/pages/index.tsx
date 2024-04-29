@@ -7,6 +7,8 @@
 // 4.2 npx shadcn-ui@latest add collapsible
 // 4.21 yarn remove @radix-ui/react-collapsible and yarn add @radix-ui/react-select
 // 5. after clicking submit, open up a bottom sheet
+// 6. click on submit which opens the drawer with the the correct input
+// 6. clicking on submit sends an API request that gets back the data
 
 import { Button } from "@/components/ui/button";
 import {
@@ -29,6 +31,8 @@ import {
 } from "@/components/ui/collapsible";
 import { ChevronsUpDown, Plus, X } from "lucide-react";
 import BottomSheet from "@/components/custom/BottomSheet";
+import { useState } from "react";
+import hardcodedData from "@/data/hardCodedData";
 
 const formSchema = z.object({
   username: z.string().min(2).max(50),
@@ -40,17 +44,43 @@ const arxivPaperFormSchema = z.object({
   pagesToDelete: z.string().optional(),
 });
 
+type ArxivPaperNote = {
+  note: string;
+  pageNumbers: Array<number>;
+};
+
 export default function Home() {
+  const [notes, setNotes] = useState<ArxivPaperNote[]>();
+
   const paperForm = useForm<z.infer<typeof arxivPaperFormSchema>>({
     resolver: zodResolver(arxivPaperFormSchema),
     defaultValues: {
-      paperUrl: "www.arxiv.com",
-      name: "hi",
+      paperUrl: "https://arxiv.org/pdf/2404.12291.pdf",
+      name: "Augmenting emotion features in irony detection with Large language modeling",
     },
   });
 
-  function onPaperSubmit(values: z.infer<typeof arxivPaperFormSchema>) {
-    console.log(values);
+  async function onPaperSubmit(values: z.infer<typeof arxivPaperFormSchema>) {
+    const response = await fetch("/api/take_notes", {
+      method: "post",
+      body: JSON.stringify(values),
+    }).then((res) => {
+      if (res.ok) {
+        console.log("is res ok?");
+        return res.json();
+      }
+      return null;
+    });
+
+    if (response) {
+      console.log(response, "2. what is this?");
+      setNotes(response);
+    } else {
+      console.log("setting data to hardcode");
+      setNotes(hardcodedData);
+      console.log(notes, "notes");
+      // throw new Error("something went wrong taking notes");
+    }
   }
 
   return (
