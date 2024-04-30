@@ -202,7 +202,7 @@ export default function Home() {
           </Form>
         </div>
         <div className="mt-8">
-          <BottomSheet />
+          <BottomSheet notes={notes} />
         </div>
       </div>
     </div>

@@ -14,8 +14,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { clsx } from "clsx";
 import { useStore } from "@/store";
+import { ArxivPaperNote } from "@/pages/api/take_notes";
 
-export default function BottomSheet() {
+export default function BottomSheet({
+  notes,
+}: {
+  notes: Array<ArxivPaperNote> | undefined;
+}) {
   const [open, setOpen] = React.useState(false);
   const [snap, setSnap] = useState<number | string | null>();
 
@@ -54,6 +59,7 @@ export default function BottomSheet() {
                   clipRule="evenodd"
                 ></path>
               </svg>
+
               <svg
                 className="text-yellow-400 h-5 w-5 flex-shrink-0"
                 viewBox="0 0 20 20"
@@ -107,12 +113,25 @@ export default function BottomSheet() {
             <p className="text-sm mt-1 text-gray-600 mb-6">
               2 modules, 27 hours of video
             </p>
-            <p className="text-gray-600">
+            {notes
+              ? notes.map((note, index) => {
+                  if (index < 10) {
+                    return (
+                      <div className="flex" key="index">
+                        {index + 1}. {note.note}
+                        <br />
+                        <br />
+                      </div>
+                    );
+                  }
+                })
+              : null}
+            {/* <p className="text-gray-600">
               The world of user interface design is an intricate landscape
               filled with hidden details and nuance. In this course, you will
               learn something cool. To the untrained eye, a beautifully designed
               UI.
-            </p>
+            </p> */}
             <button className="bg-black text-gray-50 mt-8 rounded-md h-[48px] flex-shrink-0 font-medium">
               Buy for $199
             </button>
