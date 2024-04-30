@@ -64,7 +64,7 @@ const generateNotes = ({ documents }: { documents: Array<Document> }) => {
   return response;
 };
 
-const takeNotes = async ({
+export const takeNotes = async ({
   pdfUrl,
   name,
 }: {
@@ -103,7 +103,7 @@ const takeNotes = async ({
   return notes;
 };
 
-takeNotes({
-  pdfUrl: "https://arxiv.org/pdf/2404.15949.pdf",
-  name: "test",
-});
+// takeNotes({
+//   pdfUrl: "https://arxiv.org/pdf/2404.15949.pdf",
+//   name: "test",
+// });
