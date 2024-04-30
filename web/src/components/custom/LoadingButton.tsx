@@ -2,8 +2,10 @@ import { Loader2 } from "lucide-react";
 import React from "react";
 import { Button } from "../ui/button";
 import { useStore } from "@/store";
+import { arxivPaperFormSchema } from "@/pages";
+import { z } from "zod";
 
-async function customAsyncFunction() {
+export async function customAsyncFunction() {
   await new Promise((resolve) => setTimeout(resolve, 1000));
   console.log("Hello World");
 }
@@ -11,9 +13,11 @@ async function customAsyncFunction() {
 export default function LoadingButton({
   isLoading,
   setIsLoading,
-}: {
+}: // onSubmit,
+{
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
+  // onSubmit: (values: z.infer<typeof arxivPaperFormSchema>) => void;
 }) {
   const { isDrawerOpen, setDrawerOpen } = useStore();
 
@@ -21,7 +25,8 @@ export default function LoadingButton({
     setIsLoading(true);
 
     // Perform your async operation here, like making a fetch request
-    await customAsyncFunction();
+    // await customAsyncFunction();
+    // await onSubmit();
 
     setIsLoading(false);
     setDrawerOpen(true);
@@ -31,6 +36,8 @@ export default function LoadingButton({
 
   return (
     <Button
+      // onClick={onSubmit}
+      type="submit"
       variant="outline"
       disabled={isLoading}
       onClick={handleClick}

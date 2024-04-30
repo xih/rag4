@@ -32,18 +32,20 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { ChevronsUpDown, Plus, X } from "lucide-react";
+import { ChevronsUpDown, Loader2, Plus, X } from "lucide-react";
 import BottomSheet from "@/components/custom/BottomSheet";
 import { useState } from "react";
 import hardcodedData from "@/data/hardCodedData";
 import { useStore } from "@/store/index";
-import LoadingButton from "@/components/custom/LoadingButton";
+import LoadingButton, {
+  customAsyncFunction,
+} from "@/components/custom/LoadingButton";
 
 const formSchema = z.object({
   username: z.string().min(2).max(50),
 });
 
-const arxivPaperFormSchema = z.object({
+export const arxivPaperFormSchema = z.object({
   paperUrl: z.string(),
   name: z.string(),
   pagesToDelete: z.string().optional(),
@@ -62,6 +64,7 @@ export default function Home() {
     setNotesLoading,
     isNotesLoadedSuccess,
     setNotesLoadedSuccess,
+    setDrawerOpen,
   } = useStore();
 
   const paperForm = useForm<z.infer<typeof arxivPaperFormSchema>>({
@@ -74,6 +77,7 @@ export default function Home() {
 
   async function onPaperSubmit(values: z.infer<typeof arxivPaperFormSchema>) {
     setNotesLoading(true);
+    await customAsyncFunction();
     const response = await fetch("/api/take_notes", {
       method: "post",
       body: JSON.stringify(values),
@@ -85,17 +89,21 @@ export default function Home() {
       return null;
     });
 
+    console.log("what is response here", response);
+
     if (response) {
       console.log(response, "2. what is this?");
       setNotes(response);
     } else {
       console.log("setting data to hardcode");
-      setNotes(hardcodedData);
+      console.log("2. hardcodedAta", hardcodedData);
+      await setNotes(hardcodedData);
       console.log(notes, "notes");
       // throw new Error("something went wrong taking notes");
     }
     setNotesLoading(false);
     setNotesLoadedSuccess(true);
+    setDrawerOpen(true);
   }
 
   return (
@@ -163,12 +171,26 @@ export default function Home() {
             </Collapsible>
 
             <div className="mt-10">
-              <Button type="submit">Submit</Button>
+              <Button
+                type="submit"
+                disabled={isNotesLoading}
+                // onClick={onPaperSubmit}
+                className="duration-1000 transition-all"
+              >
+                {isNotesLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Please wait
+                  </>
+                ) : (
+                  "submit"
+                )}
+              </Button>
             </div>
-            <LoadingButton
+            {/* <LoadingButton
               isLoading={isNotesLoading}
               setIsLoading={setNotesLoading}
-            />
+            /> */}
           </form>
         </Form>
         <div className="mt-8">
