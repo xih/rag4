@@ -12,6 +12,10 @@
 // 6. clicking on submit sends an API request that gets back the data
 // 7. clicking submit, triggers a loader for 1 sec, then opens up the sheet
 // 8. add zustand for state
+// 9. make the inputs on mobile span the full width
+// 10. add the notes, to the sheet and have it displayed there.
+// 11. work on the backend part2
+// 12. get a pdf link, fetch it, compose langchain documents from it
 
 import { Button } from "@/components/ui/button";
 import {
@@ -107,92 +111,96 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="mx-auto mt-8 w-1/3">
-        <Form {...paperForm}>
-          <form
-            onSubmit={paperForm.handleSubmit(onPaperSubmit)}
-            className="space-y-8"
-          >
-            <FormField
-              control={paperForm.control}
-              name="paperUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Paper Url</FormLabel>
-                  <FormControl>
-                    <Input placeholder="shadcn" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Input a paper url that you would like to question.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={paperForm.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="shadcn" {...field} />
-                  </FormControl>
-                  <FormDescription>Name of the paper</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Collapsible>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" size="sm" className="p-2 ">
-                  <p>Delete pages?</p>
-                  <ChevronsUpDown className="h-4 w-4" />
-                  <span className="sr-only">Toggle</span>
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <FormField
-                  control={paperForm.control}
-                  name="pagesToDelete"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Pages to Delete</FormLabel>
-                      <FormControl>
-                        <Input placeholder="10, 11, 12" {...field} />
-                      </FormControl>
-                      <FormDescription>Specify pages to delete</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CollapsibleContent>
-            </Collapsible>
-
-            <div className="mt-10">
-              <Button
-                type="submit"
-                disabled={isNotesLoading}
-                // onClick={onPaperSubmit}
-                className="duration-1000 transition-all"
-              >
-                {isNotesLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Please wait
-                  </>
-                ) : (
-                  "submit"
+    <div className="flex flex-col gap-5 items-center h-screen">
+      <div className="mx-4 sm:mx-auto mt-8 md:w-6/12 w-11/12">
+        <div className="max-w-screen-sm mx-auto w-full">
+          <Form {...paperForm}>
+            <form
+              onSubmit={paperForm.handleSubmit(onPaperSubmit)}
+              className="space-y-8"
+            >
+              <FormField
+                control={paperForm.control}
+                name="paperUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Paper Url</FormLabel>
+                    <FormControl>
+                      <Input placeholder="shadcn" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Input a paper url that you would like to question.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
                 )}
-              </Button>
-            </div>
-            {/* <LoadingButton
+              />
+              <FormField
+                control={paperForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="shadcn" {...field} />
+                    </FormControl>
+                    <FormDescription>Name of the paper</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Collapsible>
+                <CollapsibleTrigger asChild>
+                  <Button variant="ghost" size="sm" className="p-2 ">
+                    <p>Delete pages?</p>
+                    <ChevronsUpDown className="h-4 w-4" />
+                    <span className="sr-only">Toggle</span>
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <FormField
+                    control={paperForm.control}
+                    name="pagesToDelete"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Pages to Delete</FormLabel>
+                        <FormControl>
+                          <Input placeholder="10, 11, 12" {...field} />
+                        </FormControl>
+                        <FormDescription>
+                          Specify pages to delete
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CollapsibleContent>
+              </Collapsible>
+
+              <div className="mt-10">
+                <Button
+                  type="submit"
+                  disabled={isNotesLoading}
+                  // onClick={onPaperSubmit}
+                  className="duration-1000 transition-all"
+                >
+                  {isNotesLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Please wait
+                    </>
+                  ) : (
+                    "submit"
+                  )}
+                </Button>
+              </div>
+              {/* <LoadingButton
               isLoading={isNotesLoading}
               setIsLoading={setNotesLoading}
             /> */}
-          </form>
-        </Form>
+            </form>
+          </Form>
+        </div>
         <div className="mt-8">
           <BottomSheet />
         </div>
