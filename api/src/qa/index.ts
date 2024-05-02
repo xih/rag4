@@ -41,6 +41,16 @@ const qaModel = async ({
 export const qa = async (question: string, paperUrl: string) => {
   const database = await SupabaseDatabase.fromExistingIndex();
 
+  const qa = await database.getQa(paperUrl, question);
+
+  if (qa) {
+    console.log("database cache hit");
+    return {
+      answer: qa.answer,
+      followUpQuestions: qa.followup_questions,
+    };
+  }
+
   const documents = await database.vectorStore.similaritySearch(question, 8, {
     url: paperUrl,
   });
@@ -61,13 +71,11 @@ export const qa = async (question: string, paperUrl: string) => {
         question,
         qa.answer,
         qa.followUpQuestions,
-        formatDocumentsAsString(documents)
+        formatDocumentsAsString(documents),
+        paperUrl
       );
     }),
   ]);
-
-  console.log("saved to db");
-  console.log(documents, "documents");
 
   return qaAndFollowupQuestions;
 };

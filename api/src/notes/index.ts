@@ -81,6 +81,14 @@ export const takeNotes = async ({
     throw new Error("Needs to end with pdf");
   }
 
+  const database = await SupabaseDatabase.fromExistingIndex();
+
+  const paper = await database.getPaper(pdfUrl);
+
+  if (paper) {
+    return paper.notes;
+  }
+
   const pdfFilePath = await savePdfToFile({ pdfUrl });
 
   const documents = await createDocumentsFromPdf(pdfFilePath);
@@ -100,8 +108,6 @@ export const takeNotes = async ({
   });
 
   // store the notes in the database
-
-  const database = await SupabaseDatabase.fromDocuments(newDocs);
 
   // besides just adding the paper, there is also
   // adding the embeddings

@@ -120,7 +120,8 @@ export class SupabaseDatabase {
     question: string,
     answer: string,
     followupQuestion: Array<string>,
-    context: string
+    context: string,
+    paperUrl: string
   ) {
     const { data, error } = await this.client
       .from(ARXIV_QUESTION_ANSWERING)
@@ -129,11 +130,32 @@ export class SupabaseDatabase {
         context,
         followup_questions: followupQuestion,
         question: question,
+        paperurl: paperUrl,
       });
 
     if (error) {
       console.log(error);
     }
     return data;
+  }
+
+  async getQa(
+    paperUrl: string,
+    question: string
+  ): Promise<
+    Database["public"]["Tables"]["arxiv_question_answering"]["Row"] | null
+  > {
+    const { data, error } = await this.client
+      .from(ARXIV_QUESTION_ANSWERING)
+      .select()
+      .eq("paperurl", paperUrl)
+      .eq("question", question);
+
+    if (error) {
+      console.log(error);
+      return null;
+    }
+
+    return data[0];
   }
 }
