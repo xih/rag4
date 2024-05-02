@@ -5,6 +5,11 @@ import { ChatOpenAI } from "@langchain/openai";
 import { PromptTemplate, ChatPromptTemplate } from "@langchain/core/prompts";
 import { BaseMessageChunk } from "langchain/schema";
 
+export type ArxivPaperNote = {
+  note: string;
+  pageNumbers: Array<number>;
+};
+
 export const NOTES_TOOL_SCHEMA: OpenAIClient.ChatCompletionTool = {
   type: "function",
   function: {
@@ -138,7 +143,6 @@ export const noteOutputParser = (message: BaseMessageChunk) => {
   const notes = toolCalls
     .map((call) => {
       const obj = JSON.parse(call.function.arguments);
-      console.log("obj", obj);
       return obj.notes;
     })
     .flat();

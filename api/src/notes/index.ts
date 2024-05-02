@@ -13,6 +13,7 @@ import {
   noteOutputParser,
 } from "./prompts.js";
 import { formatDocumentsAsString } from "langchain/util/document";
+import { SupabaseDatabase } from "database.js";
 
 const savePdfToFile = async ({ pdfUrl }: { pdfUrl: string }) => {
   const response = await axios.get(pdfUrl, {
@@ -98,7 +99,22 @@ export const takeNotes = async ({
     documents: newDocs,
   });
 
-  console.log(notes, "notes");
+  // store the notes in the database
+
+  const database = await SupabaseDatabase.fromDocuments(newDocs);
+
+  // besides just adding the paper, there is also
+  // adding the embeddings
+
+  await Promise.all([
+    database.addPaper({
+      notes,
+      paperUrl: pdfUrl,
+      name,
+      paper: formatDocumentsAsString(documents),
+    }),
+    database.vectorStore.addDocuments(documents),
+  ]);
 
   return notes;
 };
