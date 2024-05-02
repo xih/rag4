@@ -1,6 +1,7 @@
 // start an express server
 import express from "express";
 import { takeNotes } from "notes/index.js";
+import { qa } from "qa/index.js";
 
 const main = () => {
   const app = express();
@@ -17,6 +18,14 @@ const main = () => {
     const notes = await takeNotes({ pdfUrl, name });
     // return notes;
     res.status(200).send(notes);
+  });
+
+  app.post("/qa", async (req, res) => {
+    const { question, paperUrl } = req.body;
+
+    const qaAndFollowUp = await qa(question, paperUrl);
+
+    res.status(200).send(qaAndFollowUp);
   });
 
   app.listen(port, () => {

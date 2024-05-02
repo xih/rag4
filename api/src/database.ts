@@ -25,7 +25,27 @@ export class SupabaseDatabase {
     this.vectorStore = vectorStore;
   }
 
-  static fromExistingIndex() {}
+  static async fromExistingIndex() {
+    const supabaseUrl = process.env.SUPABASE_PROJECT_URL;
+    const apiKey = process.env.SUPABASE_API_KEY;
+
+    if (!apiKey || !supabaseUrl) {
+      throw new Error("missing supabase credentials");
+    }
+
+    const client = createClient<Database>(supabaseUrl, apiKey);
+
+    const vectorStore = await SupabaseVectorStore.fromExistingIndex(
+      new OpenAIEmbeddings(),
+      {
+        client,
+        tableName: ARXIV_EMBEDDINGS_TABLE,
+        queryName: "match_documents",
+      }
+    );
+
+    return new this(client, vectorStore);
+  }
 
   static async fromDocuments(documents: Array<Document>) {
     // 1. check for supabase url and apikeys
@@ -76,5 +96,22 @@ export class SupabaseDatabase {
       console.log(error);
     }
     return data;
+  }
+
+  // there could be multiple papers, since seelct returns them all. just return one
+  async getPaper(
+    paperUrl: string
+  ): Promise<Database["public"]["Tables"]["arxiv_papers"]["Row"] | null> {
+    const { data, error } = await this.client
+      .from(ARXIV_PAPERS_TABLE)
+      .select()
+      .eq("arxiv_url", paperUrl);
+
+    if (error || !data) {
+      console.log("no paper found");
+      return null;
+    }
+
+    return data[0];
   }
 }
