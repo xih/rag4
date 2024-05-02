@@ -42,10 +42,10 @@ export const qa = async (question: string, paperUrl: string) => {
   const database = await SupabaseDatabase.fromExistingIndex();
 
   const documents = await database.vectorStore.similaritySearch(question, 8, {
-    arxiv_url: paperUrl,
+    url: paperUrl,
   });
 
-  // need a getPpaer funciton
+  // need a getPaper funciton
   const paper = await database.getPaper(paperUrl);
 
   const qaAndFollowupQuestions = await qaModel({
@@ -55,6 +55,19 @@ export const qa = async (question: string, paperUrl: string) => {
   });
 
   // save the qaAndFOllowUpQuestions to the database
+  await Promise.all([
+    qaAndFollowupQuestions.map((qa) => {
+      database.saveQa(
+        question,
+        qa.answer,
+        qa.followUpQuestions,
+        formatDocumentsAsString(documents)
+      );
+    }),
+  ]);
+
+  console.log("saved to db");
+  console.log(documents, "documents");
 
   return qaAndFollowupQuestions;
 };

@@ -6,12 +6,17 @@ import { BaseMessageChunk } from "langchain/schema";
 // create speech:
 // https://platform.openai.com/docs/api-reference/audio/createSpeech
 
+export type QuestionAndFollowUp = {
+  question: string;
+  followupQuestions: Array<string>;
+};
+
 // this takes in a quesiton
 export const QA_TOOL_SCHEMA: OpenAIClient.ChatCompletionTool = {
   type: "function",
   function: {
     name: "qa_tool",
-    description: "get an answer to the quesiotn and follow up questions",
+    description: "get an answer to the question and follow up questions",
     parameters: {
       type: "object",
       properties: {
@@ -49,7 +54,9 @@ export const QA_PROMPT = ChatPromptTemplate.fromMessages([
   ["human", "Question: {question}"],
 ]);
 
-export const qaOutputParser = (message: BaseMessageChunk) => {
+export const qaOutputParser = (
+  message: BaseMessageChunk
+): Array<{ answer: string; followUpQuestions: string[] }> => {
   if (!message.additional_kwargs.tool_calls) {
     throw new Error("missing tool calls");
   }
@@ -59,7 +66,6 @@ export const qaOutputParser = (message: BaseMessageChunk) => {
   const response = toolCalls
     .map((call) => {
       const args = JSON.parse(call.function.arguments);
-
       return args;
     })
     .flat();

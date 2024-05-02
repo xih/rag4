@@ -11,6 +11,7 @@ import { SupabaseVectorStore } from "langchain/vectorstores/supabase";
 import { Document } from "langchain/document";
 import { ArxivPaperNote } from "notes/prompts.js";
 import { Database } from "generated/db.js";
+import { QuestionAndFollowUp } from "qa/prompt.js";
 
 export const ARXIV_EMBEDDINGS_TABLE = "arxiv_embeddings";
 export const ARXIV_PAPERS_TABLE = "arxiv_papers";
@@ -113,5 +114,26 @@ export class SupabaseDatabase {
     }
 
     return data[0];
+  }
+
+  async saveQa(
+    question: string,
+    answer: string,
+    followupQuestion: Array<string>,
+    context: string
+  ) {
+    const { data, error } = await this.client
+      .from(ARXIV_QUESTION_ANSWERING)
+      .insert({
+        answer,
+        context,
+        followup_questions: followupQuestion,
+        question: question,
+      });
+
+    if (error) {
+      console.log(error);
+    }
+    return data;
   }
 }
